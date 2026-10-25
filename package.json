@@ -1,0 +1,23 @@
+{
+  "name": "craft-confluence",
+  "version": "0.1.0",
+  "description": "Craft diagrams in Confluence Cloud, rendered by your own craft server.",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "esbuild src/view.js --bundle --format=esm --minify --outfile=static/view/main.js && esbuild src/config.js --bundle --format=esm --minify --outfile=static/config/main.js",
+    "deploy": "npm run build && npx -y @forge/cli@14 deploy"
+  },
+  "dependencies": {
+    "@codemirror/language": "^6.13.1",
+    "@codemirror/lint": "^6.9.7",
+    "@codemirror/state": "^6.7.6",
+    "@codemirror/view": "^6.43.15",
+    "@forge/bridge": "^5.11.0",
+    "@lezer/highlight": "^1.2.5",
+    "codemirror": "^6.0.2"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
+}

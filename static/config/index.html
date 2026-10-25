@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="./main.css">
+</head>
+<body>
+  <div class="toolbar">
+    <label>Model
+      <select id="mode">
+        <option value="inline">Written here</option>
+        <option value="git">From git</option>
+        <option value="draft">Written here, on top of git</option>
+      </select>
+    </label>
+    <label class="git-only">Source <select id="gitSource"></select></label>
+    <span id="refs" class="git-only"></span>
+  </div>
+  <p id="notice" hidden></p>
+  <div class="toolbar">
+    <label>Diagram
+      <select id="type">
+        <option value="c4">C4 containers</option>
+        <option value="c4-flat">C4 containers (no boundaries)</option>
+        <option value="architecture">Domain architecture</option>
+        <option value="flow">Domain flow</option>
+        <option value="sequence">Sequence</option>
+      </select>
+    </label>
+    <label>Size
+      <select id="size">
+        <option value="40">Small</option>
+        <option value="60">Medium</option>
+        <option value="80">Large</option>
+        <option value="100">Full width</option>
+      </select>
+    </label>
+    <label class="grow">Title
+      <input id="title" placeholder="Shown under the diagram">
+    </label>
+  </div>
+  <div class="panes">
+    <div class="left">
+      <div id="editor"></div>
+      <div id="picker" hidden>
+        <input id="filter" placeholder="Filter use cases">
+        <div id="useCases"></div>
+        <p class="muted">Tick the use cases to show. None ticked shows the whole model.</p>
+      </div>
+    </div>
+    <div id="preview"><p class="muted">Preview appears here.</p></div>
+  </div>
+  <div id="approve" hidden>
+    <p>No craft server is approved for this site yet. A site admin can approve one:</p>
+    <input id="serverUrl" placeholder="https://craft.your-company.internal">
+    <button id="approveBtn" type="button">Approve server</button>
+  </div>
+  <div class="footer">
+    <p id="status" class="muted" role="status"></p>
+    <span id="server" class="muted"></span>
+    <button id="previewBtn" type="button">Preview</button>
+    <button id="cancel" type="button">Cancel</button>
+    <button id="save" type="button" class="primary">Save</button>
+  </div>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

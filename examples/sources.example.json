@@ -1,0 +1,31 @@
+{
+  "sources": [
+    {
+      "name": "payments",
+      "repos": [
+        {
+          "name": "payments-model",
+          "url": "https://oauth2:${GITLAB_TOKEN}@gitlab.example.com/architecture/payments-model.git",
+          "branch": "main",
+          "root": "craft"
+        }
+      ]
+    },
+    {
+      "name": "logistics",
+      "repos": [
+        {
+          "name": "shared-contexts",
+          "url": "https://oauth2:${GITLAB_TOKEN}@gitlab.example.com/architecture/shared-contexts.git",
+          "branch": "main"
+        },
+        {
+          "name": "logistics-model",
+          "url": "https://oauth2:${GITLAB_TOKEN}@gitlab.example.com/logistics/model.git",
+          "branch": "main",
+          "root": "docs/craft"
+        }
+      ]
+    }
+  ]
+}

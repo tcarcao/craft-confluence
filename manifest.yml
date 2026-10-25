@@ -1,0 +1,36 @@
+# Craft diagram macro. Readers see only the diagram stored as a page
+# attachment; editors change the model in the config panel, which renders it
+# through the company's own craft server, called from the browser so the
+# server can stay on an internal network.
+modules:
+  macro:
+    - key: craft-diagram
+      resource: view
+      title: Craft diagram
+      description: A diagram generated from a Craft model, stored with the page.
+      config:
+        resource: config
+        title: Craft diagram
+        viewportSize: xlarge
+resources:
+  - key: view
+    path: static/view
+  - key: config
+    path: static/config
+permissions:
+  scopes:
+    - read:page:confluence
+    - read:content-details:confluence
+    - read:attachment:confluence
+    - write:attachment:confluence
+  external:
+    # Customer-managed egress: a site admin approves the craft server's
+    # domain at runtime, so no domain is hardcoded here. This cannot be
+    # turned off again once the app is deployed to production.
+    configurable:
+      enabled: true
+app:
+  runtime:
+    name: nodejs22.x
+  # Replaced by `forge register` with the id of your own registration.
+  id: ari:cloud:ecosystem::app/b9ba361e-485a-49a5-bc15-6b0ccbf5ddaa
