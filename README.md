@@ -1,6 +1,6 @@
 # craft-confluence
 
-A Confluence Cloud macro that puts [Craft](https://github.com/tcarcao/craft) diagrams in pages. The diagram is rendered by your own craft server, which can stay on your internal network, and stored with the page, so readers never touch the server.
+A Confluence Cloud macro, **arch-craft**, that puts [Craft](https://github.com/tcarcao/craft) diagrams in pages. The diagram is rendered by your own craft server, which can stay on your internal network, and stored with the page, so readers never touch the server.
 
 ![A sequence diagram read from git, with its caption and source commit](docs/images/figure-from-git.png)
 

@@ -42,7 +42,7 @@ forge deploy -e development
 forge install -e development --site your-site.atlassian.net --product confluence
 ```
 
-In development the macro shows up as "Craft diagram (Development)". When it works for you, deploy to production:
+In development the macro shows up as "arch-craft (Development)". When it works for you, deploy to production:
 
 ```sh
 forge deploy -e production
@@ -57,7 +57,7 @@ The first time each person uses the macro, Confluence asks them to allow the app
 
 No server address is built into the app. A site admin approves one from the macro editor:
 
-1. Edit any page, type `/craft` and insert **Craft diagram**. The editor opens.
+1. Edit any page, type `/arch-craft` and insert **arch-craft**. The editor opens.
 2. The editor says no craft server is approved yet. Enter the server's address, for example `https://craft.example.internal`, and click **Approve server**.
 3. Confluence shows a dialog asking the admin to allow the app to connect to that domain. Accept it.
 4. **Reload the page.** The browser only picks up a newly approved domain after a reload. Then edit the macro again.

@@ -1,6 +1,6 @@
 # Using the macro
 
-Insert it from the page editor with `/craft` → **Craft diagram**. The editor opens straight away; reopen it later by selecting the diagram and clicking the edit (pencil) button.
+Insert it from the page editor by typing `/arch-craft` and choosing **arch-craft**. The editor opens straight away; reopen it later by selecting the diagram and clicking the edit (pencil) button.
 
 ## Choosing where the model comes from
 

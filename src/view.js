@@ -25,7 +25,7 @@ const pageId = ctx.extension.content.id;
 
 if (!cfg.attachmentId) {
   // Only editors normally see this: a freshly inserted, not yet saved macro.
-  placeholder('Craft diagram: edit this macro to add a model.');
+  placeholder('arch-craft: edit this macro to add a model.');
 } else {
   try {
     // version pins the exact render this macro config points at.
@@ -63,6 +63,6 @@ if (!cfg.attachmentId) {
     }
     root.replaceChildren(...parts);
   } catch (e) {
-    placeholder(`Craft diagram could not be loaded (${e.message}).`);
+    placeholder(`arch-craft diagram could not be loaded (${e.message}).`);
   }
 }

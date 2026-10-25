@@ -6,11 +6,11 @@ modules:
   macro:
     - key: craft-diagram
       resource: view
-      title: Craft diagram
-      description: A diagram generated from a Craft model, stored with the page.
+      title: arch-craft
+      description: Architecture diagram from a Craft model, stored with the page.
       config:
         resource: config
-        title: Craft diagram
+        title: arch-craft
         viewportSize: xlarge
 resources:
   - key: view
