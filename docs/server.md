@@ -7,10 +7,10 @@ The macro renders diagrams through a craft server that you run. Only people edit
 The server is published as a Docker image:
 
 ```sh
-docker run -d --name craft -p 8080:8080 tiagocarcao/craft:<version>
+docker run -d --name craft -p 8080:8080 tiagocarcao/craft:v2.28.0
 ```
 
-Use a version newer than v2.27.0. Earlier servers answer browser preflight requests with a bare 405, so the macro cannot reach them, and they have no git sources.
+Use v2.28.0 or later (image tags carry the `v`). Earlier servers answer browser preflight requests with a bare 405, so the macro cannot reach them, and they have no git sources.
 
 That is enough for diagrams written in the macro. For diagrams read from git, add a sources file (section 3).
 
@@ -86,7 +86,7 @@ docker run -d --name craft -p 8080:8080 \
   -e GITLAB_TOKEN=glpat-xxxxxxxx \
   -v "$PWD/sources.json:/config/sources.json:ro" \
   -v craft-cache:/cache \
-  tiagocarcao/craft:<version>
+  tiagocarcao/craft:v2.28.0
 ```
 
 | Variable | Meaning |
@@ -108,6 +108,8 @@ Check it:
 curl https://craft.example.internal/sources
 curl -X POST https://craft.example.internal/sources/payments/catalog -d '{}'
 ```
+
+A repo can also be a local path, for example a folder mounted into the container. Git refuses a repo owned by a different user than the server's, so for mounted repos point `GIT_CONFIG_GLOBAL` at a git config file containing `[safe] directory = *` ([example](local-development.md#3-add-a-git-source-optional)).
 
 ## Access control
 

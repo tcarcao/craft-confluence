@@ -50,11 +50,13 @@ Then see [docs/usage.md](docs/usage.md) for writing and picking diagrams.
 
 To try everything on one machine first, follow [docs/local-development.md](docs/local-development.md).
 
+Not an admin yourself? [docs/rollout.md](docs/rollout.md) lists who in your organisation does which step, and has a request you can send them.
+
 ## Requirements
 
 - Confluence Cloud.
 - Node.js 22 or later, and Forge CLI 14 or later (older versions reject the egress setting this app uses).
-- A craft server newer than v2.27.0: the macro needs its browser CORS fix and the `/sources` endpoints. Until a release includes them, build the server from source.
+- A craft server v2.28.0 or later: the macro needs its browser CORS fix and the `/sources` endpoints.
 - HTTPS on the craft server. Forge only approves `https://` domains.
 
 ## Known limitations

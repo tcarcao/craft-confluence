@@ -60,7 +60,7 @@ No server address is built into the app. A site admin approves one from the macr
 1. Edit any page, type `/arch-craft` and insert **arch-craft**. The editor opens.
 2. The editor says no craft server is approved yet. Enter the server's address, for example `https://craft.example.internal`, and click **Approve server**.
 3. Confluence shows a dialog asking the admin to allow the app to connect to that domain. Accept it.
-4. **Reload the page.** The browser only picks up a newly approved domain after a reload. Then edit the macro again.
+4. **Reload the page.** The browser only picks up a newly approved domain after a reload. Then insert the macro again: cancelling a macro that was never saved removes it from the page.
 
 The footer of the editor shows which server it uses ("via craft.example.internal").
 
@@ -82,7 +82,7 @@ When a new version asks for more permissions, Forge says so during deploy; run `
 | Approving the server fails with "Dry run failed". | The address is not `https://`. Forge only approves HTTPS domains. |
 | The server is approved but every request fails. | The page was not reloaded after approving. Reload and try again. |
 | Preview stays on "Still waiting for the craft server". | Chrome is asking whether the page may access devices on the local network. Answer the prompt (look near the address bar). |
-| "Could not reach https://...: Failed to fetch". | The browser cannot reach the server: VPN off, certificate not trusted, or the server is v2.27.0 or older and rejects the browser's preflight request. Open the server address in a new tab to check the first two. |
+| "Could not reach https://...: Failed to fetch". | The browser cannot reach the server: VPN off, certificate not trusted, or the server is older than v2.28.0 and rejects the browser's preflight request. Open the server address in a new tab to check the first two. |
 | "From git" options are greyed out. | The server has no `CRAFT_SOURCES`, or it is too old to have `/sources`. |
 | "ref ... not found". | The branch or merge request does not exist in that repo, or the server has not fetched it yet (it fetches when its copy is more than 30 seconds old). |
 | The diagram shows red underlines and does not save. | The model has errors. Hover the underline for the message. Warnings (yellow) do not block saving. |

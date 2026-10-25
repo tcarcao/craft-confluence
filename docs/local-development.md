@@ -9,7 +9,7 @@ You need a Confluence Cloud site where you are an admin. A free site from [atlas
 With Docker:
 
 ```sh
-docker run -d --name craft -p 8080:8080 tiagocarcao/craft:<version>
+docker run -d --name craft -p 8080:8080 tiagocarcao/craft:v2.28.0
 ```
 
 Or from source, if you work on the server too (needs Go, Java and [PlantUML](https://plantuml.com/download) on your `PATH` as `plantuml`):
@@ -86,7 +86,25 @@ JSON
 CRAFT_SOURCES=~/craft-demo/sources.json CRAFT_CACHE=~/craft-demo/cache go run ./cmd/server
 ```
 
-With Docker, mount the repo and the file into the container and use the container's paths in `url`.
+With Docker, mount the demo folder and use the container's paths in `url`. Git refuses a repo owned by another user ("detected dubious ownership"), and a mounted folder is owned by you, not by the container's user, so give git a config file that trusts it:
+
+```sh
+cat > ~/craft-demo/sources.json <<'JSON'
+{"sources": [{"name": "identity", "repos": [
+  {"name": "identity", "url": "/demo/identity", "branch": "main", "root": "craft"}
+]}]}
+JSON
+printf '[safe]\n\tdirectory = *\n' > ~/craft-demo/gitconfig
+
+docker run -d --name craft -p 8080:8080 \
+  -e CRAFT_SOURCES=/demo/sources.json \
+  -e CRAFT_CACHE=/tmp/craft-cache \
+  -e GIT_CONFIG_GLOBAL=/demo/gitconfig \
+  -v ~/craft-demo:/demo:ro \
+  tiagocarcao/craft:v2.28.0
+```
+
+Check it with `curl -X POST https://craft.localtest.me:8443/sources/identity/catalog -d '{}'`. With Podman on macOS, keep the folder under your home folder, which is what the Podman machine shares by default.
 
 ## 4. Deploy the app to your site
 
