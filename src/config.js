@@ -58,7 +58,7 @@ $('title').value = cfg.title ?? '';
 let titleIsAuto = cfg.titleAuto ?? true;
 const autoTitle = () => {
   const src = source();
-  const useCase = src.match(/use_case\s+"([^"]+)"/)?.[1];
+  const useCase = src.match(/^\s*use_case\s+"([^"]+)"/m)?.[1];
   const domains = [...src.matchAll(/^\s*domain\s+(\w+)/gm)].map((m) => m[1]);
   const type = $('type').value;
   if (type === 'board' && mode() !== 'git') {
@@ -83,7 +83,7 @@ $('useCase').onchange = refreshTitle;
 // Git mode picks it from the ticked list instead.
 const showUseCase = () => { $('useCaseLabel').hidden = $('type').value !== 'board' || mode() === 'git'; };
 const refreshUseCases = (keep = $('useCase').value) => {
-  const names = [...new Set([...source().matchAll(/use_case\s+"([^"]+)"/g)].map((m) => m[1]))];
+  const names = [...new Set([...source().matchAll(/^\s*use_case\s+"([^"]+)"/gm)].map((m) => m[1]))];
   $('useCase').replaceChildren(...names.map((n) => new Option(n, n)));
   $('useCase').value = names.includes(keep) ? keep : names[0] ?? '';
 };
@@ -186,7 +186,7 @@ const loadCatalog = async () => {
 // A draft whose use cases are all in git now (its MR merged) should be read
 // from git instead of kept as a copy that drifts.
 const offerPromotion = (inGit) => {
-  const drafted = [...source().matchAll(/use_case\s+"([^"]+)"/g)].map((m) => m[1]);
+  const drafted = [...source().matchAll(/^\s*use_case\s+"([^"]+)"/gm)].map((m) => m[1]);
   if (!drafted.length || !drafted.every((n) => inGit.has(n))) return;
   notice(`${drafted.join(', ')} ${drafted.length > 1 ? 'are' : 'is'} in git now.`, {
     label: 'Read from git instead',
@@ -357,8 +357,15 @@ const needOneTick = () => {
   return true;
 };
 
+// Inline and draft boards send the chosen use case; empty would make the server pick one.
+const needUseCase = () => {
+  if ($('type').value !== 'board' || mode() === 'git' || $('useCase').value) return false;
+  status('Add a use_case to the model to draw a board.', true);
+  return true;
+};
+
 $('previewBtn').onclick = guard(async () => {
-  if (needOneTick()) return;
+  if (needOneTick() || needUseCase()) return;
   status('Rendering...');
   showPreview((await render()).svg);
   status('');
@@ -369,7 +376,7 @@ $('cancel').onclick = () => view.close();
 $('save').onclick = guard(async () => {
   const display = { width: Number($('size').value), title: $('title').value, titleAuto: titleIsAuto };
   const type = $('type').value;
-  if (needOneTick()) return;
+  if (needOneTick() || needUseCase()) return;
 
   // Inline and only size or title changed: keep the stored diagram, skip the server.
   if (mode() === 'inline' && (cfg.mode ?? 'inline') === 'inline' && await renderKey(type, source(), boardUseCase()) === cfg.hash && cfg.attachmentId) {
@@ -380,7 +387,7 @@ $('save').onclick = guard(async () => {
   const { svg, hash, contentId, commits } = await render();
   const model = mode() === 'inline'
     ? { mode: 'inline', source: source(), ...(type === 'board' && { useCase: boardUseCase() }) }
-    : { mode: mode(), gitSource: $('gitSource').value, refs: refs(), useCases: checked(), contentId, commits, ...(mode() === 'draft' && { source: source(), ...(type === 'board' && { useCase: boardUseCase(), useCases: [boardUseCase()] }) }) };
+    : { mode: mode(), gitSource: $('gitSource').value, refs: refs(), useCases: checked(), contentId, commits, ...(mode() === 'draft' && { source: source(), ...(type === 'board' && { useCase: boardUseCase()}) }) };
   // Same render as stored (git unchanged): keep the attachment.
   if (hash === cfg.hash && cfg.attachmentId) {
     await view.submit({ config: { ...cfg, ...model, ...display } });
