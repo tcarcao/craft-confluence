@@ -53,7 +53,6 @@ $('mode').value = cfg.mode ?? 'inline';
 $('type').value = cfg.type ?? 'c4';
 $('size').value = String(cfg.width ?? 60);
 $('title').value = cfg.title ?? '';
-refreshUseCases(cfg.useCase);
 
 // The title follows the model until the user types their own.
 let titleIsAuto = cfg.titleAuto ?? true;
@@ -227,6 +226,7 @@ $('gitSource').value = cfg.gitSource ?? sources[0]?.name ?? '';
 // Older configs kept one ref, for the first repo.
 const firstRepo = sources.find((x) => x.name === $('gitSource').value)?.repos[0]?.name;
 showRefs(cfg.refs ?? (cfg.ref && firstRepo ? { [firstRepo]: cfg.ref } : {}));
+refreshUseCases(cfg.useCase);
 showMode();
 await loadCatalog();
 // Opening a stored git diagram: say when git has moved on since it was saved.
@@ -380,7 +380,7 @@ $('save').onclick = guard(async () => {
   const { svg, hash, contentId, commits } = await render();
   const model = mode() === 'inline'
     ? { mode: 'inline', source: source(), ...(type === 'board' && { useCase: boardUseCase() }) }
-    : { mode: mode(), gitSource: $('gitSource').value, refs: refs(), useCases: checked(), contentId, commits, ...(mode() === 'draft' && { source: source(), ...(type === 'board' && { useCase: boardUseCase() }) }) };
+    : { mode: mode(), gitSource: $('gitSource').value, refs: refs(), useCases: checked(), contentId, commits, ...(mode() === 'draft' && { source: source(), ...(type === 'board' && { useCase: boardUseCase(), useCases: [boardUseCase()] }) }) };
   // Same render as stored (git unchanged): keep the attachment.
   if (hash === cfg.hash && cfg.attachmentId) {
     await view.submit({ config: { ...cfg, ...model, ...display } });
