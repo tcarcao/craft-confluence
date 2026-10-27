@@ -16,6 +16,8 @@ const TYPES = {
   architecture: { label: 'domain architecture', request: (dsl) => ['/preview/domain', { dsl, diagramType: 'domain', domainMode: 'architecture' }] },
   flow: { label: 'domain flow', request: (dsl) => ['/preview/domain', { dsl, diagramType: 'domain' }] },
   sequence: { label: 'sequence', request: (dsl) => ['/preview/domain', { dsl, diagramType: 'sequence' }] },
+  // The preview endpoint answers plain SVG text; source renders answer base64.
+  board: { label: 'scenario board', plain: true, request: (dsl, useCase) => ['/preview/board/domain', { dsl, useCase }] },
 };
 
 const $ = (id) => document.getElementById(id);
@@ -42,7 +44,7 @@ const editor = new EditorView({
       '&': { height: '100%', fontSize: '13px' },
       '.cm-scroller': { fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace' },
     }),
-    EditorView.updateListener.of((u) => u.docChanged && refreshTitle()),
+    EditorView.updateListener.of((u) => u.docChanged && (refreshUseCases(), refreshTitle())),
   ],
 });
 const source = () => editor.state.doc.toString();
@@ -51,6 +53,7 @@ $('mode').value = cfg.mode ?? 'inline';
 $('type').value = cfg.type ?? 'c4';
 $('size').value = String(cfg.width ?? 60);
 $('title').value = cfg.title ?? '';
+refreshUseCases(cfg.useCase);
 
 // The title follows the model until the user types their own.
 let titleIsAuto = cfg.titleAuto ?? true;
@@ -59,6 +62,9 @@ const autoTitle = () => {
   const useCase = src.match(/use_case\s+"([^"]+)"/)?.[1];
   const domains = [...src.matchAll(/^\s*domain\s+(\w+)/gm)].map((m) => m[1]);
   const type = $('type').value;
+  if (type === 'board' && mode() !== 'git') {
+    return $('useCase').value ? `${$('useCase').value}: ${TYPES.board.label}` : '';
+  }
   if (mode() === 'git') {
     const picked = checked();
     const subject = picked.length && !type.startsWith('c4') ? picked.join(', ') : $('gitSource').value;
@@ -71,7 +77,18 @@ const autoTitle = () => {
 };
 const refreshTitle = () => { if (titleIsAuto) $('title').value = autoTitle(); };
 $('title').oninput = () => { titleIsAuto = $('title').value === ''; };
-$('type').onchange = refreshTitle;
+$('type').onchange = () => { showUseCase(); refreshTitle(); };
+$('useCase').onchange = refreshTitle;
+
+// The board's use case: a select over the use cases written in the editor.
+// Git mode picks it from the ticked list instead.
+const showUseCase = () => { $('useCaseLabel').hidden = $('type').value !== 'board' || mode() === 'git'; };
+const refreshUseCases = (keep = $('useCase').value) => {
+  const names = [...new Set([...source().matchAll(/use_case\s+"([^"]+)"/g)].map((m) => m[1]))];
+  $('useCase').replaceChildren(...names.map((n) => new Option(n, n)));
+  $('useCase').value = names.includes(keep) ? keep : names[0] ?? '';
+};
+const boardUseCase = () => ($('type').value === 'board' ? $('useCase').value : '');
 
 // The approved server is the first client-side egress domain the admin set.
 const { results } = await permissions.egress.get({ keys: [EGRESS_KEY] });
@@ -189,6 +206,7 @@ const showMode = () => {
   for (const el of document.querySelectorAll('.git-only')) el.hidden = m === 'inline';
   $('editor').hidden = m === 'git';
   $('picker').hidden = m !== 'git';
+  showUseCase();
   refreshTitle();
 };
 $('mode').onchange = () => { notice(''); showMode(); loadCatalog(); };
@@ -239,7 +257,7 @@ const sha256 = async (text) => {
 };
 // Everything that changes the rendered file; the format is in it so diagrams
 // stored as PNG by older versions re-render once.
-const renderKey = (type, dsl) => sha256(`svg\n${type}\n${dsl}`);
+const renderKey = (type, dsl, useCase = '') => sha256(`svg\n${type}\n${dsl}${useCase && `\n${useCase}`}`);
 
 // Diagnostics that belong in the editor: an inline model's, or a draft's own
 // (git files carry their repo path as sourceUri).
@@ -264,11 +282,11 @@ let rendered = null;
 // only it knows whether git changed; the response's contentId says.
 const request = () => {
   const type = $('type').value;
-  if (mode() === 'inline') return TYPES[type].request(source());
+  if (mode() === 'inline') return TYPES[type].request(source(), $('useCase').value);
   return [`/sources/${encodeURIComponent($('gitSource').value)}/render`, {
     refs: refs(),
     view: type,
-    ...(mode() === 'git' ? { useCases: checked() } : { dsl: source() }),
+    ...(mode() === 'git' ? { useCases: checked() } : { dsl: source(), ...(type === 'board' && { useCases: [$('useCase').value] }) }),
   }];
 };
 
@@ -286,9 +304,10 @@ const render = async () => {
     showDiagnostics(diags.filter(inEditor));
     const errors = diags.filter((d) => d.severity === 'error' && inEditor(d));
     if (errors.length) throw new Error(`${errors.length} error(s) in the model, see the highlighted lines.`);
-    const svg = new TextDecoder().decode(Uint8Array.from(atob(json.data), (c) => c.charCodeAt(0)));
+    const plain = mode() === 'inline' && TYPES[$('type').value].plain;
+    const svg = plain ? json.data : new TextDecoder().decode(Uint8Array.from(atob(json.data), (c) => c.charCodeAt(0)));
     const hash = mode() === 'inline'
-      ? await renderKey($('type').value, source())
+      ? await renderKey($('type').value, source(), boardUseCase())
       : await sha256(`svg\n${reqKey}\n${json.contentId}`);
     rendered = { reqKey, hash, svg, contentId: json.contentId, commits: json.commits };
     return rendered;
@@ -331,7 +350,15 @@ const guard = (fn) => async () => {
   }
 };
 
+// A board draws one use case; in git mode that is the single ticked one.
+const needOneTick = () => {
+  if ($('type').value !== 'board' || mode() !== 'git' || checked().length === 1) return false;
+  status('A board draws one use case: tick exactly one.', true);
+  return true;
+};
+
 $('previewBtn').onclick = guard(async () => {
+  if (needOneTick()) return;
   status('Rendering...');
   showPreview((await render()).svg);
   status('');
@@ -342,17 +369,18 @@ $('cancel').onclick = () => view.close();
 $('save').onclick = guard(async () => {
   const display = { width: Number($('size').value), title: $('title').value, titleAuto: titleIsAuto };
   const type = $('type').value;
+  if (needOneTick()) return;
 
   // Inline and only size or title changed: keep the stored diagram, skip the server.
-  if (mode() === 'inline' && (cfg.mode ?? 'inline') === 'inline' && await renderKey(type, source()) === cfg.hash && cfg.attachmentId) {
+  if (mode() === 'inline' && (cfg.mode ?? 'inline') === 'inline' && await renderKey(type, source(), boardUseCase()) === cfg.hash && cfg.attachmentId) {
     await view.submit({ config: { ...cfg, ...display } });
     return;
   }
   status('Rendering...');
   const { svg, hash, contentId, commits } = await render();
   const model = mode() === 'inline'
-    ? { mode: 'inline', source: source() }
-    : { mode: mode(), gitSource: $('gitSource').value, refs: refs(), useCases: checked(), contentId, commits, ...(mode() === 'draft' && { source: source() }) };
+    ? { mode: 'inline', source: source(), ...(type === 'board' && { useCase: boardUseCase() }) }
+    : { mode: mode(), gitSource: $('gitSource').value, refs: refs(), useCases: checked(), contentId, commits, ...(mode() === 'draft' && { source: source(), ...(type === 'board' && { useCase: boardUseCase() }) }) };
   // Same render as stored (git unchanged): keep the attachment.
   if (hash === cfg.hash && cfg.attachmentId) {
     await view.submit({ config: { ...cfg, ...model, ...display } });

@@ -57,6 +57,7 @@ If a ticked use case no longer exists at that ref (it was renamed or removed), t
 | Domain architecture | Bounded contexts by service. A compact overview. |
 | Domain flow | How contexts interact across the selected use cases. |
 | Sequence | Each selected use case as a sequence of interactions. Usually the most readable in a document. |
+| Scenario board | One use case drawn as a Miro-style board. Written here and on top of git, pick the use case from the list of use cases in the editor; from git, tick exactly one. Rendered as SVG. |
 
 ## Size and caption
 
