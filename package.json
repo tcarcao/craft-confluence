@@ -1,5 +1,5 @@
 {
-  "name": "craft-confluence",
+  "name": "arch-craft-confluence",
   "version": "0.1.0",
   "description": "Craft diagrams in Confluence Cloud, rendered by your own craft server.",
   "license": "MIT",
