@@ -55,14 +55,14 @@ The first time each person uses the macro, Confluence asks them to allow the app
 
 ## 4. Approve the craft server
 
-No server address is built into the app. A site admin approves one from the macro editor:
+No server address is built into the app. A site admin approves one, once for the whole site, from the macro editor. Editors never enter it: every diagram uses the approved server.
 
 1. Edit any page, type `/arch-craft` and insert **arch-craft**. The editor opens.
 2. The editor says no craft server is approved yet. Enter the server's address, for example `https://craft.example.internal`, and click **Approve server**.
 3. Confluence shows a dialog asking the admin to allow the app to connect to that domain. Accept it.
 4. **Reload the page.** The browser only picks up a newly approved domain after a reload. Then insert the macro again: cancelling a macro that was never saved removes it from the page.
 
-The footer of the editor shows which server it uses ("via craft.example.internal").
+The footer of the editor shows which server it uses ("via craft.example.internal"). The page used for the approval does not need to be published. To change servers later, a site admin updates the same setting.
 
 ## Updating
 

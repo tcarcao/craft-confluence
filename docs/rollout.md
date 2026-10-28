@@ -9,7 +9,7 @@ Rolling out the app involves four groups: Atlassian administrators, the team tha
 | Register and deploy the app | App owner | An Atlassian account, the Forge CLI and an API token. |
 | Install the app on the Confluence site | Confluence site admin | Site administrator. |
 | Allow the app in spaces with data security policies | Organisation admin | Only if data security policies block apps. |
-| Approve the craft server address | Confluence site admin | Site administrator. One click in the macro editor. |
+| Approve the craft server address | Confluence site admin | Site administrator. Done once for the whole site, from the macro editor. |
 | Run the craft server over HTTPS on the internal network | Platform or infrastructure team | A container runtime, an internal DNS name, and a certificate trusted by company devices. |
 | Grant the server read access to the model repositories | Maintainer of each repository or group | GitLab Maintainer, to create a deploy token or project access token with `read_repository`. |
 | Pre-approve the browser's local network prompt (optional) | IT | Chrome policy management. Without it, each editor accepts a one-time prompt. |
@@ -21,7 +21,9 @@ The app owner can complete every step up to installation, then hand an installat
 1. Register the app and deploy it **to production** ([install.md](install.md), steps 1 to 3, skipping `forge install`): `forge deploy -e production`. Installation links are only available for production.
 2. In the [developer console](https://developer.atlassian.com/console/myapps/), open the app, go to **Distribution**, click **Edit**, set the status to **Sharing** and complete the required details (owner, support contact). Under **Installation link**, choose Confluence and copy the link.
 3. Send the link to a site admin, who opens it, selects the site and accepts the permissions.
-4. Ask the same admin to approve the server: insert the macro on any page and click **Approve server** with the server's address ([install.md, step 4](install.md#4-approve-the-craft-server)).
+4. Ask the same admin to approve the craft server ([install.md, step 4](install.md#4-approve-the-craft-server)). The approval button only appears in the macro editor: the admin edits any page, types `/arch-craft` to insert the macro, enters the server's address and clicks **Approve server**. The page does not need to be published; the draft can be discarded afterwards.
+
+The approval is a site-wide setting, done once. Editors never enter a server address: every diagram on the site uses the approved server. To move to a new server, a site admin updates the same setting.
 
 ## App ownership
 
@@ -43,6 +45,6 @@ Answers to the questions security and platform reviewers usually ask:
 > We would like to install a Confluence app that generates architecture diagrams from our Craft models. The app is open source (github.com/tcarcao/craft-confluence) and we deploy our own copy. Could you:
 >
 > 1. install it on our Confluence site using this link: `<installation link>`;
-> 2. insert the **arch-craft** macro on any page and approve `https://<craft server address>` when prompted.
+> 2. approve our craft server, once for the whole site: edit any page, type `/arch-craft` to insert the macro, enter `https://<craft server address>` and click **Approve server**. The page does not need to be published.
 >
 > The app reads and writes attachments on the pages where it is used. It communicates only with our internal craft server, from the editor's browser. No data is sent to third parties.
